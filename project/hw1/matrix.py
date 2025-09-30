@@ -1,5 +1,6 @@
 # Operations for matrices
 
+
 def mat_sum(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
     """Складывает две матрицы одинакового размера.
 
@@ -24,8 +25,9 @@ def mat_sum(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
         raise ValueError("Matrices must have the same number of rows")
     if any(len(row1) != len(row2) for row1, row2 in zip(m1, m2)):
         raise ValueError("Matrices must have the same number of columns")
-    
+
     return [[a + b for a, b in zip(row1, row2)] for row1, row2 in zip(m1, m2)]
+
 
 def mat_prod(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
     """Перемножает две матрицы одинакового размера.
@@ -35,7 +37,7 @@ def mat_prod(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
         m2 (list[list[float]]): Вторая матрица m x k.
 
     Returns:
-        list[list[float]]: Результирующая матрица n x k, где i,j элемент — произведение i-ой строки первой матрицы на 
+        list[list[float]]: Результирующая матрица n x k, где i,j элемент — произведение i-ой строки первой матрицы на
         j-ый столбей второй матрицы.
 
     Raises:
@@ -57,6 +59,7 @@ def mat_prod(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
         raise ValueError("Matrix m2 is not rectangular")
 
     return [[sum(a * b for a, b in zip(row, col)) for col in zip(*m2)] for row in m1]
+
 
 def transpose(m: list[list[float]]) -> list[list[float]]:
     """Транспонирование матрицы.

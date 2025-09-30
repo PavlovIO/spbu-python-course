@@ -1,5 +1,7 @@
 from math import sqrt, acos
+
 # Operations for vectors
+
 
 def dot_prod(v1: list[float], v2: list[float]) -> float:
     """Вычисляет скалярное произведение двух векторов.
@@ -27,8 +29,7 @@ def dot_prod(v1: list[float], v2: list[float]) -> float:
     if len(v1) != len(v2):
         raise ValueError("Vectors must have the same length")
     return sum(a * b for a, b in zip(v1, v2))
-    
-    
+
 
 def vec_len(v: list[float]) -> float:
     """Вычисляет длину (евклидову норму) вектора.
@@ -51,8 +52,10 @@ def vec_len(v: list[float]) -> float:
         >>> vec_len([0, 0])
         0.0
     """
-    if not v: raise ValueError("Vector must not be empty")
+    if not v:
+        raise ValueError("Vector must not be empty")
     return sqrt(sum(ai**2 for ai in v))
+
 
 def angle(v1: list[float], v2: list[float]) -> float:
     """Вычисляет угол между двумя векторами в радианах.
@@ -73,8 +76,8 @@ def angle(v1: list[float], v2: list[float]) -> float:
 
     Examples:
         >>> import math
-        >>> angle([1, 0], [0, 1]) 
-        1.5707963267948966 
+        >>> angle([1, 0], [0, 1])
+        1.5707963267948966
         >>> angle([1,1],[5,5])
         0.0
     """
@@ -84,8 +87,6 @@ def angle(v1: list[float], v2: list[float]) -> float:
         raise ValueError("Angle undefined for zero vector")
     cos_angle = dot_prod(v1, v2) / (l1 * l2)
     cos_angle = max(-1.0, min(1.0, cos_angle))
-    if abs(1-cos_angle) < 1.0e-15: cos_angle = 1
+    if abs(1 - cos_angle) < 1.0e-15:
+        cos_angle = 1
     return acos(cos_angle)
-
-
-

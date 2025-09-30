@@ -4,27 +4,26 @@ from math import sqrt, acos
 
 
 def dot_prod(v1: list[float], v2: list[float]) -> float:
-    """Вычисляет скалярное произведение двух векторов.
+    """Computes the dot product of two vectors.
 
-    Скалярное произведение определяется как сумма попарных произведений
-    соответствующих элементов векторов.
+    The dot product is defined as the sum of the pairwise products
+    of the corresponding elements of the vectors.
 
     Args:
-        v1 (list[float]): Первый вектор.
-        v2 (list[float]): Второй вектор.
+        v1 (list[float]): The first vector.
+        v2 (list[float]): The second vector.
 
     Returns:
-        float: Скалярное произведение векторов.
+        float: The dot product of the vectors.
 
     Raises:
-        ValueError: Если векторы имеют разную длину.
-        TypeError: Если элементы векторов не являются числами.
+        ValueError: If the vectors have different lengths.
 
     Examples:
         >>> dot_prod([1, 2], [3, 4])
-        11.0
+        11
         >>> dot_prod([1, 0], [0, 1])
-        0.0
+        0
     """
     if len(v1) != len(v2):
         raise ValueError("Vectors must have the same length")
@@ -32,19 +31,18 @@ def dot_prod(v1: list[float], v2: list[float]) -> float:
 
 
 def vec_len(v: list[float]) -> float:
-    """Вычисляет длину (евклидову норму) вектора.
+    """Computes the Euclidean norm (length) of a vector.
 
-    Длина вектора определяется как квадратный корень из суммы квадратов его компонент.
+    The length of a vector is defined as the square root of the sum of the squares of its components.
 
     Args:
-        v (list[float]): Вектор.
+        v (list[float]): The input vector.
 
     Returns:
-        float: Длина вектора.
+        float: The length of the vector.
 
     Raises:
-        ValueError: Если вектор пуст.
-        TypeError: Если элементы вектора не являются числами.
+        ValueError: If the vector is empty.
 
     Examples:
         >>> vec_len([3, 4])
@@ -58,27 +56,26 @@ def vec_len(v: list[float]) -> float:
 
 
 def angle(v1: list[float], v2: list[float]) -> float:
-    """Вычисляет угол между двумя векторами в радианах.
+    """Computes the angle between two vectors in radians.
 
-    Угол вычисляется по формуле:
+    The angle is calculated using the formula:
         angle = arccos( (v1 · v2) / (|v1| * |v2|) )
 
     Args:
-        v1 (list[float]): Первый вектор.
-        v2 (list[float]): Второй вектор.
+        v1 (list[float]): The first vector.
+        v2 (list[float]): The second vector.
 
     Returns:
-        float: Угол между векторами в радианах (от 0 до π).
+        float: The angle between the vectors in radians (in the range [0, π]).
 
     Raises:
-        ValueError: Если хотя бы один из векторов нулевой или пустой.
-        TypeError: Если элементы векторов не являются числами.
+        ValueError: If either vector is zero or empty.
 
     Examples:
         >>> import math
         >>> angle([1, 0], [0, 1])
-        1.5707963267948966
-        >>> angle([1,1],[5,5])
+        1.5707963267948966  # π/2
+        >>> angle([1, 1], [5, 5])
         0.0
     """
     l1 = vec_len(v1)

@@ -2,18 +2,18 @@
 
 
 def mat_sum(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
-    """Складывает две матрицы одинакового размера.
+    """Adds two matrices of the same size.
 
     Args:
-        m1 (list[list[float]]): Первая матрица.
-        m2 (list[list[float]]): Вторая матрица.
+        m1 (list[list[float]]): The first matrix.
+        m2 (list[list[float]]): The second matrix.
 
     Returns:
-        list[list[float]]: Результирующая матрица, где каждый элемент — сумма
-        соответствующих элементов входных матриц.
+        list[list[float]]: The resulting matrix where each element is the sum
+        of the corresponding elements from the input matrices.
 
     Raises:
-        ValueError: Если матрицы пусты или имеют разные размеры.
+        ValueError: If either matrix is empty or if the matrices have different dimensions.
 
     Examples:
         >>> mat_sum([[1, 2]], [[3, 4]])
@@ -30,23 +30,24 @@ def mat_sum(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
 
 
 def mat_prod(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
-    """Перемножает две матрицы одинакового размера.
+    """Multiplies two matrices.
 
     Args:
-        m1 (list[list[float]]): Первая матрица n x m.
-        m2 (list[list[float]]): Вторая матрица m x k.
+        m1 (list[list[float]]): The first matrix of size n x m.
+        m2 (list[list[float]]): The second matrix of size m x k.
 
     Returns:
-        list[list[float]]: Результирующая матрица n x k, где i,j элемент — произведение i-ой строки первой матрицы на
-        j-ый столбей второй матрицы.
+        list[list[float]]: The resulting matrix of size n x k, where the element at (i, j)
+        is the dot product of the i-th row of the first matrix and the j-th column of the second matrix.
 
     Raises:
-        ValueError: Если матрицы пусты или имеют разные размеры.
+        ValueError: If either matrix is empty or if the number of columns in m1
+        does not match the number of rows in m2.
 
     Examples:
         >>> mat_prod([[1, 2]], [[3], [4]])
         [[11]]
-        >>> mat_prod([[1, 2], [3, 4]], [[3, 5],[4, 6]])
+        >>> mat_prod([[1, 2], [3, 4]], [[3, 5], [4, 6]])
         [[11, 17], [25, 39]]
     """
     if not m1 or not m1[0] or not m2 or not m2[0]:
@@ -62,16 +63,16 @@ def mat_prod(m1: list[list[float]], m2: list[list[float]]) -> list[list[float]]:
 
 
 def transpose(m: list[list[float]]) -> list[list[float]]:
-    """Транспонирование матрицы.
+    """Transposes a matrix.
 
     Args:
-        m1 (list[list[float]]): Исходная матрица n x m.
+        m (list[list[float]]): The input matrix of size n x m.
 
     Returns:
-        list[list[float]]: Результирующая транспонированая матрица m x n.
+        list[list[float]]: The transposed matrix of size m x n.
 
     Raises:
-        ValueError: Если матрица не прямоугольная.
+        ValueError: If the input matrix is not rectangular.
 
     Examples:
         >>> transpose([[1, 2, 3]])

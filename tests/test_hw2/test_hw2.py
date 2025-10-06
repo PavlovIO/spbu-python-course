@@ -82,7 +82,7 @@ def test_as_func_reduce_no_func_raises():
 
 
 def test_as_func_reduce_too_many_args_raises():
-    with pytest.raises(ValueError, match="reduce accepts at most one initializer"):
+    with pytest.raises(ValueError, match="reduce requires at most one initializer"):
         hw2.as_func(reduce, 1, 2, func=lambda a, b: a + b)
 
 

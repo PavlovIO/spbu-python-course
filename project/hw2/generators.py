@@ -105,12 +105,12 @@ def as_func(
     if pred is not None:
         extra_kwargs["pred"] = pred
 
-    def wrapper(items: Iterable) -> Iterable:
+    def wrap(items: Iterable) -> Iterable:
         comb_kwargs = {**extra_kwargs, **kwargs}
         result = operator(items, *args, **comb_kwargs)
         yield from result
 
-    return wrapper
+    return wrap
 
 
 def pipe(

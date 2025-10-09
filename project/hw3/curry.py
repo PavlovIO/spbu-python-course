@@ -1,4 +1,6 @@
 from typing import Callable, Any
+
+
 def curry_explicit(func: Callable[..., Any], arity: int) -> Callable:
     """Transforms a function of fixed arity into its curried form.
 
@@ -34,12 +36,15 @@ def curry_explicit(func: Callable[..., Any], arity: int) -> Callable:
         raise ValueError("Arity can be negative")
     if arity == 0:
         return func
+
     def curry(args: list[Any]) -> Callable:
         if len(args) == arity:
             return func(*args)
         else:
             return lambda x: curry(args + [x])
+
     return curry([])
+
 
 def uncurry_explicit(func: Callable[..., Any], arity: int) -> Callable:
     """Transforms a curried function back into a function of fixed arity.
@@ -79,6 +84,7 @@ def uncurry_explicit(func: Callable[..., Any], arity: int) -> Callable:
         raise ValueError("Arity can be negative")
     if arity == 0:
         return func
+
     def uncurry(*args: Any) -> Any:
         if len(args) != arity:
             raise TypeError(f"Expected {arity} arguments, got {len(args)}")
@@ -86,5 +92,5 @@ def uncurry_explicit(func: Callable[..., Any], arity: int) -> Callable:
         for arg in args:
             result = result(arg)
         return result
-    return uncurry     
-       
+
+    return uncurry

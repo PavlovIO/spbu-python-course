@@ -4,7 +4,7 @@ import copy
 from collections import deque
 from typing import Any, Callable
 
-#---Cache Decorator---
+# ---Cache Decorator---
 def cache_keys(args: tuple, kwargs: dict[str, Any]) -> tuple:
     try:
         key = (args,) + tuple(sorted(kwargs.items()))
@@ -12,6 +12,7 @@ def cache_keys(args: tuple, kwargs: dict[str, Any]) -> tuple:
         return key
     except TypeError as e:
         raise TypeError(f"Arguments must be hashable: {e}")
+
 
 def cache_func(func: Callable | None = None, *, maxsize: int = 0) -> Callable:
     """Caches the results of function calls using a FIFO (first-in, first-out) strategy.
@@ -63,22 +64,22 @@ def cache_func(func: Callable | None = None, *, maxsize: int = 0) -> Callable:
     if func is None:
         return lambda f: cache_func(f, maxsize=maxsize)
     if maxsize <= 0:
-            return func
-    
+        return func
+
     cache: dict[tuple, Any] = {}
     key_ord: deque[tuple] = deque()
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        
+
         try:
-            key = cache_keys(args,kwargs)
+            key = cache_keys(args, kwargs)
         except TypeError as e:
             return func(*args, **kwargs)
-        
+
         if key in cache:
             return cache[key]
-        
+
         result = func(*args, **kwargs)
         cache[key] = result
         key_ord.append(key)
@@ -86,12 +87,15 @@ def cache_func(func: Callable | None = None, *, maxsize: int = 0) -> Callable:
         if len(cache) > maxsize:
             pop_key = key_ord.popleft()
             del cache[pop_key]
-        
-        return result
-    return wrapper
-#-------------------------------
 
-#---Smart Arguments Decorator---
+        return result
+
+    return wrapper
+
+
+# -------------------------------
+
+# ---Smart Arguments Decorator---
 class Isolated:
     """Sentinel class to mark arguments that should be deep-copied upon function call.
 
@@ -99,7 +103,9 @@ class Isolated:
     argument for this parameter must be deep-copied before being passed to the
     function body. This prevents accidental mutation of the original object.
     """
+
     pass
+
 
 class Evaluated:
     """Wrapper for callables that should be evaluated at call time for default values.
@@ -112,10 +118,12 @@ class Evaluated:
     Args:
         func: A callable with no arguments that returns a value.
     """
+
     def __init__(self, func: Callable[[], Any]) -> None:
         if func is None:
             raise ValueError("Evaluated requires a callable as argument")
         self.func = func
+
 
 def smart_args(func: Callable | None = None, pos_args: bool = False) -> Callable:
     """Decorator that enhances function arguments with smart default behaviors.
@@ -173,32 +181,39 @@ def smart_args(func: Callable | None = None, pos_args: bool = False) -> Callable
         ...     return data
         ...
         >>> result = process({'input': 42})  # data is isolated
-    """    
+    """
     if func is None:
         return lambda f: smart_args(f, pos_args=pos_args)
 
-    #not using getfullargspec() as it is outdated
+    # not using getfullargspec() as it is outdated
     sig = inspect.signature(func)
 
     isolated = set()
     evaluated: dict[str, Any] = {}
 
     for name, param in sig.parameters.items():
-        is_kwarg = (param.kind == inspect.Parameter.KEYWORD_ONLY)
-        #check whether positional argument allowed to take Isolated or Evaluated as default
-        is_pos_allowed = (pos_args and param.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD))
-        
+        is_kwarg = param.kind == inspect.Parameter.KEYWORD_ONLY
+        # check whether positional argument allowed to take Isolated or Evaluated as default
+        is_pos_allowed = pos_args and param.kind in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
+
         is_iso = isinstance(param.default, Isolated)
         is_eva = isinstance(param.default, Evaluated)
 
-        assert (is_kwarg or is_pos_allowed) or not (is_iso or is_eva) ,f"Positioanal argument {name} can't use Isolated or Evaluated if flag pos_args is False"
+        assert (is_kwarg or is_pos_allowed) or not (
+            is_iso or is_eva
+        ), f"Positioanal argument {name} can't use Isolated or Evaluated if flag pos_args is False"
         """if not ( (is_kwarg or is_pos_allowed) or not (is_iso or is_eva) ):
             raise ValueError(f"Positioanal argument {name} can't use Isolated or Evaluated if flag pos_args is False")"""
 
-        assert not (is_iso and is_eva), f"Argument {name} can't use Isolated and Evaluated together"
+        assert not (
+            is_iso and is_eva
+        ), f"Argument {name} can't use Isolated and Evaluated together"
         """if is_iso and is_eva:
             raise ValueError(f"Argument {name} can't use Isolated and Evaluated together ")"""
-        
+
         if is_iso:
             isolated.add(name)
         elif is_eva:
@@ -206,20 +221,18 @@ def smart_args(func: Callable | None = None, pos_args: bool = False) -> Callable
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        #making BoundArgument variable arguments where arguments.arguments - dict[arg_name, arg_value]
+        # making BoundArgument variable arguments where arguments.arguments - dict[arg_name, arg_value]
         arguments = sig.bind(*args, **kwargs)
-        arguments.apply_defaults() #adds arguments that doesnt get value and dont have default value
+        arguments.apply_defaults()  # adds arguments that doesnt get value and dont have default value
 
         for name in isolated:
             if name in arguments.arguments:
                 arguments.arguments[name] = copy.deepcopy(arguments.arguments[name])
 
         for name, ev_func in evaluated.items():
-            if (arguments.arguments[name] == sig.parameters[name].default):
+            if arguments.arguments[name] == sig.parameters[name].default:
                 arguments.arguments[name] = ev_func()
 
         return func(*arguments.args, **arguments.kwargs)
-    
+
     return wrapper
-
-

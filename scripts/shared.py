@@ -3,7 +3,7 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).parent.parent
 DOCS = ROOT / "docs"
-TESTS = ROOT / "tests"
+TESTS = ROOT / "tests/test_hw3"
 
 
 def configure_python_path():

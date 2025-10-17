@@ -246,11 +246,14 @@ def smart_args(func: Callable | None = None, pos_args: bool = False) -> Callable
     evaluated: dict[str, Any] = {}
 
     for name, param in sig.parameters.items():
-        is_kwarg = param.kind in (inspect.Parameter.KEYWORD_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        is_kwarg = param.kind in (
+            inspect.Parameter.KEYWORD_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
         # check whether positional argument allowed to take Isolated or Evaluated as default
         is_pos_allowed = pos_args and param.kind in (
             inspect.Parameter.POSITIONAL_ONLY,
-            inspect.Parameter.POSITIONAL_OR_KEYWORD
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
         )
 
         is_iso = isinstance(param.default, Isolated)

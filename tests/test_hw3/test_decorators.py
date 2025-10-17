@@ -116,6 +116,7 @@ def test_isolated_positional_allowed():
 def test_isolated_positional_not_allowed():
     """Test that Isolated raises AssertionError for positional args when pos_args=False."""
     with pytest.raises(AssertionError, match="Positioanal argument"):
+
         @hw3.smart_args(pos_args=False)
         def bad_func(data=hw3.Isolated(), /):
             return data
@@ -124,20 +125,21 @@ def test_isolated_positional_not_allowed():
 def test_evaluated_keyword_only():
     """Test Evaluated with keyword-only arguments."""
     call_count = 0
+
     def get_counter():
         nonlocal call_count
         call_count += 1
         return call_count
-    
+
     @hw3.smart_args
     def get_number(*, x=get_counter(), seed=hw3.Evaluated(get_counter)):
         return (x, seed)
 
     num1 = get_number()
     num2 = get_number()
-    
+
     assert num1 == (1, 2)
-    assert num2 == (1, 3)  
+    assert num2 == (1, 3)
 
 
 def test_evaluated_positional_allowed():
@@ -206,7 +208,7 @@ def test_deepcopy_nested_structures():
 
 def test_cache_and_smart_args_composition():
     """Test that cache_func and smart_args work together correctly.
-    
+
     This test verifies that:
     1. smart_args evaluates the dynamic default (Evaluated) on first call
     2. cache_func caches the result of the first call
@@ -215,25 +217,25 @@ def test_cache_and_smart_args_composition():
     """
     call_count = 0
     eval_count = 0
-    
+
     def dynamic_value():
         nonlocal eval_count
         eval_count += 1
         return 100 + eval_count
-    
+
     @hw3.cache_func(maxsize=2)
     @hw3.smart_args
     def composed_func(*, x=hw3.Evaluated(dynamic_value)):
         nonlocal call_count
         call_count += 1
         return x
-    
-    # First call: 
+
+    # First call:
     # - smart_args calls dynamic_value() → returns 101
     # - function body executes → call_count = 1
     # - cache_func stores result 101
     result1 = composed_func()
-    
+
     # Second call:
     # - smart_args would normally call dynamic_value(), BUT...
     # - cache_func sees same arguments and returns cached result
@@ -245,66 +247,72 @@ def test_cache_and_smart_args_composition():
     assert result2 == 101
     assert call_count == 1
     assert eval_count == 1
-    
+
     # Third call with different argument (bypasses cache)
     result3 = composed_func(x=999)
     assert result3 == 999
     assert call_count == 2
     assert eval_count == 1
 
+
 def test_smart_args_isolated_and_evaluated_together():
     """Test simultaneous use of Isolated and Evaluated on different arguments."""
     eval_count = 0
+
     def get_timestamp():
         nonlocal eval_count
         eval_count += 1
         return f"time_{eval_count}"
-    
+
     @hw3.smart_args
     def process_data(data=hw3.Isolated(), timestamp=hw3.Evaluated(get_timestamp)):
-        data['processed'] = "True"
-        data['timestamp'] = timestamp
+        data["processed"] = "True"
+        data["timestamp"] = timestamp
         return data
 
-    original_data = {'id': 123, 'value': 'test'}
+    original_data = {"id": 123, "value": "test"}
 
     result1 = process_data(data=original_data)
     result2 = process_data(data=original_data)
 
-    assert 'processed' not in original_data
-    assert result1['processed'] == "True"
-    assert result2['processed'] == "True"
+    assert "processed" not in original_data
+    assert result1["processed"] == "True"
+    assert result2["processed"] == "True"
 
-    assert result1['timestamp'] == "time_1"
-    assert result2['timestamp'] == "time_2"
-    assert eval_count == 2 
+    assert result1["timestamp"] == "time_1"
+    assert result2["timestamp"] == "time_2"
+    assert eval_count == 2
+
 
 def test_smart_args_isolated_evaluated_keyword_args():
     """Test Isolated and Evaluated with regular keyword arguments (no *)."""
     call_count = 0
+
     def get_default_value():
         nonlocal call_count
         call_count += 1
         return call_count
-    
+
     @hw3.smart_args
-    def configure(config=hw3.Isolated(), timeout=hw3.Evaluated(get_default_value), retries=3):
-        config['timeout'] = timeout
-        config['retries'] = retries
+    def configure(
+        config=hw3.Isolated(), timeout=hw3.Evaluated(get_default_value), retries=3
+    ):
+        config["timeout"] = timeout
+        config["retries"] = retries
         return config
-    
-    original_config = {'name': 'service', 'enabled': True}
+
+    original_config = {"name": "service", "enabled": True}
 
     result1 = configure(config=original_config, retries=2)
     result2 = configure(config=original_config, timeout=999)
-    
-    assert 'timeout' not in original_config
-    assert 'retries' not in original_config
-    assert original_config == {'name': 'service', 'enabled': True}
 
-    assert result1['timeout'] == 1
-    assert result2['timeout'] == 999
+    assert "timeout" not in original_config
+    assert "retries" not in original_config
+    assert original_config == {"name": "service", "enabled": True}
+
+    assert result1["timeout"] == 1
+    assert result2["timeout"] == 999
     assert call_count == 1
 
-    assert result1['retries'] == 2
-    assert result2['retries'] == 3
+    assert result1["retries"] == 2
+    assert result2["retries"] == 3

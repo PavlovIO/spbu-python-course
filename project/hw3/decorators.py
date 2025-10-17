@@ -6,6 +6,60 @@ from typing import Any, Callable
 
 # ---Cache Decorator---
 def cache_keys(args: tuple, kwargs: dict[str, Any]) -> tuple:
+    """
+    Generate a hashable cache key from function arguments.
+
+    This function constructs a canonical, hashable representation of the given
+    positional and keyword arguments, suitable for use as a key in a dictionary-
+    based cache (e.g., for memoization). The resulting key is a flat tuple that
+    combines the positional arguments and sorted keyword argument items.
+
+    Parameters
+    ----------
+    args : tuple
+        A tuple of positional arguments. All elements must be hashable.
+    kwargs : dict[str, Any]
+        A dictionary of keyword arguments. All keys must be strings (as per type hint),
+        and all values must be hashable.
+
+    Returns
+    -------
+    tuple
+        A hashable tuple representing the combined arguments, structured as:
+        ``(args,) + tuple(sorted(kwargs.items()))``.
+        This format ensures consistent ordering of keyword arguments and
+        preserves the structure of positional arguments.
+
+    Raises
+    ------
+    TypeError
+        If any element in `args` or any value in `kwargs` is unhashable
+        (e.g., `list`, `dict`, `set`, or other mutable types). The error
+        message includes details about the unhashable type.
+
+    Examples
+    --------
+    >>> cache_keys((1, 2), {'x': 'a', 'y': 3})
+    ((1, 2), ('x', 'a'), ('y', 3))
+
+    >>> cache_keys((), {'flag': True})
+    ((), ('flag', True))
+
+    >>> cache_keys(([1, 2],), {})  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+        ...
+    TypeError: Arguments must be hashable: unhashable type: 'list'
+
+    Notes
+    -----
+    - Keyword arguments are sorted by key to ensure consistent ordering,
+      making the cache key independent of the insertion order in `kwargs`.
+    - Only hashable types (e.g., `int`, `str`, `tuple`, `frozenset`, etc.)
+      are allowed. Mutable containers like `list` or `dict` will cause a
+      `TypeError`.
+    - This function assumes `kwargs` keys are strings, as indicated by the
+      type annotation, which guarantees they are hashable and sortable.
+    """
     try:
         key = (args,) + tuple(sorted(kwargs.items()))
         hash(key)
@@ -192,11 +246,11 @@ def smart_args(func: Callable | None = None, pos_args: bool = False) -> Callable
     evaluated: dict[str, Any] = {}
 
     for name, param in sig.parameters.items():
-        is_kwarg = param.kind == inspect.Parameter.KEYWORD_ONLY
+        is_kwarg = param.kind in (inspect.Parameter.KEYWORD_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
         # check whether positional argument allowed to take Isolated or Evaluated as default
         is_pos_allowed = pos_args and param.kind in (
             inspect.Parameter.POSITIONAL_ONLY,
-            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD
         )
 
         is_iso = isinstance(param.default, Isolated)

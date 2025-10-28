@@ -1,18 +1,15 @@
-from typing import Union
+from .modules import *
 from .DiceManager import DiceManager
 from .ScoreManager import ScoreManager
 
-"""
-Player can roll dices, lock any, choose a combination, start/end round, view score table
-"""
-
 class PlayerManager():
-    def __init__(self, dm: DiceManager, name: str) -> None:
+    def __init__(self, dm: DiceManager, name: str, is_bot: bool = False) -> None:
         self.name = name
         self.dm = dm
         self.score = ScoreManager()
         self.rolls = 0
         self.calculated: dict[str, int] = {}
+        self.is_bot = is_bot
 
     def start_round(self) -> None:
         self.rolls = 0
@@ -31,7 +28,7 @@ class PlayerManager():
         # maybe add flag for end of the round
 
     def get_score(self) -> dict[str,list[Union[int,bool]]]:
-        return self.score.table
+        return self.score.table.copy()
     
     def get_calculated(self) -> dict[str, int]:
         calc: dict[str, int] = self.calculated.copy()
@@ -73,7 +70,7 @@ class PlayerManager():
                 possible = []
                 for number in set(dices):
                     if dices.count(number) >= 2: 
-                        possible.append(number)
+                        possible.append(number*2)
                 if len(possible) >= 2:
                     c = sum(sorted(possible)[-2:]) * roll_mult
             elif comb == "3_of_a_kind":
@@ -85,6 +82,8 @@ class PlayerManager():
                     c = 10 * roll_mult
                 elif all([i in set(dices) for i in [2,3,4,5]]):
                     c = 14 * roll_mult
+                elif all([i in set(dices) for i in [3,4,5,6]]):
+                    c = 18 * roll_mult
             elif comb == "high_straight":
                 if all([i in set(dices) for i in [1,2,3,4,5]]):
                     c = 15 * roll_mult
@@ -116,7 +115,23 @@ class PlayerManager():
             raise ValueError("Round 1 choice must be an upper section combination")
         self.score.calc_bonus()
 
-        
-
+    def decide_lock(self, dices: list[int], round: int) -> list[int]:
+        raise NotImplementedError("Player can't use Bot's functions")
+    def decide_choose(self, round: int) -> str:
+        raise NotImplementedError("Player can't use Bot's functions")
+    def _lock_for_comb(self, comb: str, dices: list[int]) -> list[int]:
+        raise NotImplementedError("Player can't use Bot's functions")
                     
+    def reload(self):
+        self.score = ScoreManager()
 
+    def get_state(self) -> dict:
+        return {
+            "name": self.name,
+            "is_bot": self.is_bot,
+            "strategy": getattr(self, "strategy", None),
+            "rolls_used": self.rolls,
+            "dice_state": self.dm.get_state(),
+            "score_state": self.get_score(),
+            "calculated": self.get_calculated()
+        }

@@ -1,8 +1,4 @@
-from random import randint
-
-"""
-Dices: you can roll, lock, look at them
-"""
+from .modules import *
 
 class DiceManager():
     def __init__(self) -> None:
@@ -25,5 +21,11 @@ class DiceManager():
     def _set_dices(self, dices: list[int]) -> None:
         if len(dices) != 5: raise ValueError(f"It must be 5 dices, but {len(dices)} were given")
         self.dices = dices
+
+    def get_state(self) -> dict:
+        return {
+            "dices": self.get_dices(),
+            "locked": self.get_locked()
+        }
 
 

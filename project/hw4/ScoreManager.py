@@ -1,5 +1,4 @@
-from typing import Union
-
+from .modules import *
 """
 Score table: you can get bonus, choose the combination, find available, get total
 """

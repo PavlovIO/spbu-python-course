@@ -1,6 +1,4 @@
-from typing import Union
-import re
-
+from .modules import *
 class UIManager():
     def __init__(self): # add options for arbitrary output chanale, add option for logging
         pass
@@ -9,7 +7,10 @@ class UIManager():
         print(output, end=_end)
     
     def get_raw_input(self) -> str:
-        return input()
+        while True:
+            raw_input = input()
+            #if raw_input == "": self.write("Name can't be empty")
+            return raw_input
 
     def get_input(self, options: list[str], lock: bool = False)  -> Union[list[str]]:
         if lock:

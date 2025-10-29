@@ -1,15 +1,17 @@
 from typing import Optional, Any, Generator, Iterator
 from collections.abc import MutableMapping
 
+
 class Node:
     """A node in a binary search tree (BST).
-    
+
     Attributes:
         key: The key used for ordering in the BST.
         value: The associated value stored with the key.
         left: Left child node (keys less than this node's key).
         right: Right child node (keys greater than this node's key).
     """
+
     def __init__(self, key: Any, value: Any) -> None:
         self.key = key
         self.value = value
@@ -19,10 +21,11 @@ class Node:
 
 class BST:
     """A binary search tree (BST) implementation.
-    
+
     Supports insertion, deletion, search, and in-order iteration.
     Keys must be comparable (support <, >, ==).
     """
+
     def __init__(self, root: Optional[Node] = None) -> None:
         self.root = root
 
@@ -44,7 +47,7 @@ class BST:
     def minimum(self, root: Optional[Node]) -> Optional[Node]:
         """Find the node with the smallest key in the subtree.
         Args:
-            root: The root of the subtree to search.  
+            root: The root of the subtree to search.
         Returns:
             The node with the minimum key, or None if subtree is empty.
         """
@@ -148,18 +151,19 @@ class BST:
 
 class HashTable(MutableMapping):
     """A hash table implementation using BSTs for collision resolution.
-    
+
     Each bucket is a binary search tree, so keys must be both hashable and comparable.
     Automatically resizes when load factor exceeds 0.75.
     """
-    def __init__(self, max_size: int =16) -> None:
+
+    def __init__(self, max_size: int = 16) -> None:
         self.max_size = max_size
         self.buckets: list = [None] * self.max_size
         self.size = 0
 
     def insert(self, key: Any, value: Any) -> None:
         """Insert or update a key-value pair.
-        
+
         Resizes the table if the load factor exceeds 0.75.
         """
         if self.size >= self.max_size * 0.75:
@@ -184,7 +188,7 @@ class HashTable(MutableMapping):
 
     def reshape(self, new_size: Optional[int] = None):
         """Resize the hash table to a new size (default: double current size).
-        
+
         Rehashes all existing key-value pairs into the new bucket array.
         """
         if new_size is None:
@@ -202,7 +206,7 @@ class HashTable(MutableMapping):
 
     def __getitem__(self, key: Any) -> Any:
         """Get the value for the given key.
-        
+
         Raises:
             KeyError: If the key is not found.
         """
@@ -233,7 +237,7 @@ class HashTable(MutableMapping):
         for bucket in self.buckets:
             if bucket is not None:
                 yield from bucket
-   
+
     def __str__(self) -> str:
         """Return a string representation of the hash table (like a dict)."""
         out = "{"
@@ -243,4 +247,3 @@ class HashTable(MutableMapping):
             for key, value in tree.items():
                 out += f"{key}: {value}, "
         return out[:-2] + "}" if out != "{" else "{}"
-

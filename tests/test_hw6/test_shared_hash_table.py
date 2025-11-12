@@ -1,5 +1,4 @@
 import threading
-import time
 import random
 import pytest
 from project.hw6 import BST

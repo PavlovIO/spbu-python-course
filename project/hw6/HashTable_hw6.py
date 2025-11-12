@@ -30,7 +30,7 @@ class BST:
         self.root = root
 
     def find(self, root: Optional[Node], key: Any) -> Optional[Node]:
-        """Iterativle search for a node with the given key.
+        """Iteratively search for a node with the given key.
         Args:
             root: The root node to start searching from.
             key: The key to search for.
@@ -46,7 +46,6 @@ class BST:
             else:
                 node = node.right
         return node
- 
 
     def minimum(self, root: Optional[Node]) -> Optional[Node]:
         """Find the node with the smallest key in the subtree.
@@ -261,6 +260,7 @@ class HashTable(MutableMapping):
         """
         if new_size is None:
             new_size = self.max_size * 2
+        self.size = 0
         new_buckets: list = [None] * new_size
         for key, value in self.items():
             hash_key = hash(key) % new_size

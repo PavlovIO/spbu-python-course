@@ -102,7 +102,7 @@ class BST:
         """
         node = root
         prev = None
-        #find node
+        # find node
         while node is not None:
             if key == node.key:
                 break
@@ -112,19 +112,19 @@ class BST:
             else:
                 prev = node
                 node = node.right
-        #case no node or root
+        # case no node or root
         if node is None:
             return root
-        #case node is root
+        # case node is root
         if prev is None:
-            if node.left is None and node.right is None:# node is leaf - just delete
+            if node.left is None and node.right is None:  # node is leaf - just delete
                 return None
-            elif node.left is not None or node.right is not None:# node is not leaf
-                if node.left is None:# node have only right
+            elif node.left is not None or node.right is not None:  # node is not leaf
+                if node.left is None:  # node have only right
                     return node.right
-                elif node.right is None:# node have only left
+                elif node.right is None:  # node have only left
                     return node.left
-                else:# node have both left and right
+                else:  # node have both left and right
                     suc = node.right
                     par = node
                     while suc.left is not None:
@@ -139,25 +139,25 @@ class BST:
                     node.key = n_key
                     node.value = n_value
                     return node
-        #case node is no root
+        # case node is no root
         else:
-            if node.left is None and node.right is None:# node is leaf - just delete
+            if node.left is None and node.right is None:  # node is leaf - just delete
                 if node.key < prev.key:
                     prev.left = None
                 else:
                     prev.right = None
-            elif node.left is not None or node.right is not None:# node is not leaf
-                if node.left is None:# node have only right
+            elif node.left is not None or node.right is not None:  # node is not leaf
+                if node.left is None:  # node have only right
                     if node.key < prev.key:
                         prev.left = node.right
                     else:
                         prev.right = node.right
-                elif node.right is None:# node have only left
+                elif node.right is None:  # node have only left
                     if node.key < prev.key:
                         prev.left = node.left
                     else:
                         prev.right = node.left
-                else:# node have both left and right
+                else:  # node have both left and right
                     suc = node.right
                     par = node
                     while suc.left is not None:

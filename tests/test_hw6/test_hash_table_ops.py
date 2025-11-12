@@ -136,7 +136,6 @@ def test_Hash_rewrite_insertion(key, value, new_value):
         assert ht[key] == value
         ht[key] = new_value
         assert ht[key] == new_value
-        
 
 
 def test_Hash_basic_operators():
@@ -155,14 +154,12 @@ def test_Hash_basic_operators():
         del ht["key_9"]
         assert "key_9" not in ht
         assert len(ht) == 9
-        
 
 
 def test_Hash_None_insertion():
     with ShardedHashTable() as ht:
         ht[1] = None
         assert ht[1] is None
-        
 
 
 def test_Hash_delete_missing():
@@ -170,7 +167,7 @@ def test_Hash_delete_missing():
         ht["a"] = 1
         del ht["b"]
         assert len(ht) == 1
-        
+
 
 def test_Hash_get():
     with ShardedHashTable() as ht:
@@ -178,4 +175,3 @@ def test_Hash_get():
         assert ht.get("1") == "one"
         assert ht.get("missing") is None
         assert ht.get("missing", "default") == "default"
-        

@@ -10,9 +10,11 @@ def test_parallel_inserts_and_reads():
     NUM_KEYS = 1_000
 
     with ShardedHashTable(4) as table:
+
         def writer(thread_id):
             for i in range(thread_id * NUM_KEYS, (thread_id + 1) * NUM_KEYS):
                 table[i] = i
+
         def reader():
             for _ in range(NUM_KEYS * NUM_THREADS):
                 key = random.randint(0, NUM_KEYS * NUM_THREADS - 1)
@@ -21,7 +23,9 @@ def test_parallel_inserts_and_reads():
                 except KeyError:
                     pass
 
-        writers = [threading.Thread(target=writer, args=(t,)) for t in range(NUM_THREADS)]
+        writers = [
+            threading.Thread(target=writer, args=(t,)) for t in range(NUM_THREADS)
+        ]
         readers = [threading.Thread(target=reader) for _ in range(NUM_THREADS)]
 
         for w in writers:
@@ -36,6 +40,7 @@ def test_parallel_inserts_and_reads():
 
         for i in range(NUM_THREADS * NUM_KEYS):
             assert table[i] == i, f"Key {i} has incorrect value"
+
 
 def test_concurrent_updates_do_not_corrupt_data():
     with ShardedHashTable(2) as table:
@@ -61,10 +66,11 @@ def test_concurrent_updates_do_not_corrupt_data():
         for t in threads:
             t.join()
         expected = ITERATIONS * THREADS
-        assert table[key] == expected, (
-            f"Data corruption: expected {expected}, got {table[key]}"
-        )
+        assert (
+            table[key] == expected
+        ), f"Data corruption: expected {expected}, got {table[key]}"
         assert total_sum == expected
+
 
 def test_concurrent_inserts_and_deletes():
     with ShardedHashTable(4) as table:
@@ -74,6 +80,7 @@ def test_concurrent_inserts_and_deletes():
         def inserter():
             for i in range(10_000, 20_000):
                 table[i] = i
+
         def deleter():
             for i in range(0, 10_000):
                 try:
@@ -90,11 +97,15 @@ def test_concurrent_inserts_and_deletes():
 
         deleted = [i for i in range(0, 10_000) if i in table]
         added = [i for i in range(10_000, 20_000) if i not in table]
-        assert len(deleted) == 0, f"Некоторые старые ключи не были удалены: {deleted[:10]}"
+        assert (
+            len(deleted) == 0
+        ), f"Некоторые старые ключи не были удалены: {deleted[:10]}"
         assert len(added) == 0, f"Некоторые новые ключи не были вставлены: {added[:10]}"
+
 
 def increment(cur_val, delta):
     return cur_val + delta
+
 
 def test_atomic_upd_func():
     with ShardedHashTable(4) as table:
@@ -102,6 +113,7 @@ def test_atomic_upd_func():
         assert table[0] == 100
         table.atomic_update(0, increment, 1)
         assert table[0] == 101
+
 
 def test_locking_behavior_under_high_contention():
     with ShardedHashTable(4) as table:
@@ -123,4 +135,6 @@ def test_locking_behavior_under_high_contention():
             t.join()
 
         total = sum(table[k] for k in range(KEYS))
-        assert total == NUM_THREADS * 2000, "Несогласованные обновления — блокировки не работают!"
+        assert (
+            total == NUM_THREADS * 2000
+        ), "Несогласованные обновления — блокировки не работают!"

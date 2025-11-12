@@ -2,7 +2,10 @@ import random
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from project.hw6 import HashTable
+
 print("start")
+
+
 def main() -> None:
     NUM_OPS = 5_000_000
     READ_RATIO = 0.8
@@ -35,22 +38,25 @@ def main() -> None:
                 except Exception:
                     local_errors += 1
         return local_errors
-    
+
     print("_3_")
     with ThreadPoolExecutor(max_workers=THREADS) as pool:
         futures = [pool.submit(worker, i) for i in range(THREADS)]
         total_errors = sum(f.result() for f in as_completed(futures))
-    
+
     print("_4_")
     end = time.perf_counter()
     elapsed = end - start
     ops_per_sec = NUM_OPS / elapsed
 
-    print(f"\nCompleted {NUM_OPS:,} operations in {elapsed:.2f}s "
-            f"({ops_per_sec:,.0f} ops/sec)")
+    print(
+        f"\nCompleted {NUM_OPS:,} operations in {elapsed:.2f}s "
+        f"({ops_per_sec:,.0f} ops/sec)"
+    )
     print(f"Total errors: {total_errors}")
 
     assert total_errors == 0, f"Encountered {total_errors} unexpected errors"
+
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,10 @@ from threading import Lock
 from collections.abc import MutableMapping
 import atexit
 
-def request_handle(ht: HashTable, request: tuple[str, Any, Optional[Any], Optional[tuple[Any]]]) -> Any:
+
+def request_handle(
+    ht: HashTable, request: tuple[str, Any, Optional[Any], Optional[tuple[Any]]]
+) -> Any:
     """
     Handles a single request to the hash table worker process.
 
@@ -23,8 +26,13 @@ def request_handle(ht: HashTable, request: tuple[str, Any, Optional[Any], Option
         - result: The result of the operation on success, or an exception object on failure.
     """
     try:
-        op, key, val, args = request[0], request[1] if len(request)>1 else None, request[2] if len(request)>2 else None, request[3] if len(request)>3 else None
-        if op == "get":   
+        op, key, val, args = (
+            request[0],
+            request[1] if len(request) > 1 else None,
+            request[2] if len(request) > 2 else None,
+            request[3] if len(request) > 3 else None,
+        )
+        if op == "get":
             out = ht[key]
             return ("ok", out)
         elif op == "set":
@@ -54,7 +62,8 @@ def request_handle(ht: HashTable, request: tuple[str, Any, Optional[Any], Option
             return ("error", ValueError(f"Unknown operation: {op}"))
     except Exception as e:
         return ("error", e)
-    
+
+
 def sharded_worker(request_queue: Queue, response_queue: Queue):
     """
     Worker process function that handles requests for a single shard.
@@ -73,6 +82,7 @@ def sharded_worker(request_queue: Queue, response_queue: Queue):
             break
         response = request_handle(ht, request)
         response_queue.put(response)
+
 
 class ShardedHashTable(MutableMapping):
     """
@@ -100,7 +110,10 @@ class ShardedHashTable(MutableMapping):
         self.response_queue: list[Queue] = [Queue() for _ in range(self.shard_num)]
         self.workers: list[Process] = []
         for i in range(self.shard_num):
-            p = Process(target=sharded_worker, args=[self.request_queue[i], self.response_queue[i]])
+            p = Process(
+                target=sharded_worker,
+                args=[self.request_queue[i], self.response_queue[i]],
+            )
             p.start()
             self.workers.append(p)
         self.max_size = 0
@@ -110,10 +123,10 @@ class ShardedHashTable(MutableMapping):
                 ms = self.response_queue[i].get()
                 if ms[0] == "error":
                     raise ms[1]
-                self.max_size+=ms[1]
-        
+                self.max_size += ms[1]
+
         atexit.register(self.close)
-          
+
     def __setitem__(self, key: Any, value: Any) -> None:
         """
         Sets the value for a given key in the hash table.
@@ -122,13 +135,13 @@ class ShardedHashTable(MutableMapping):
             key: The key to set.
             value: The value to associate with the key.
         """
-        shard_id = hash(key)%self.shard_num
+        shard_id = hash(key) % self.shard_num
         with self.locks[shard_id]:
             self.request_queue[shard_id].put(("set", key, value))
             response = self.response_queue[shard_id].get()
             if response[0] == "error":
                 raise response[1]
-    
+
     def __getitem__(self, key: Any) -> Any:
         """
         Gets the value for a given key from the hash table.
@@ -142,7 +155,7 @@ class ShardedHashTable(MutableMapping):
         Raises:
             KeyError: If the key is not found.
         """
-        shard_id = hash(key)%self.shard_num
+        shard_id = hash(key) % self.shard_num
         with self.locks[shard_id]:
             self.request_queue[shard_id].put(("get", key))
             response = self.response_queue[shard_id].get()
@@ -161,7 +174,7 @@ class ShardedHashTable(MutableMapping):
         Raises:
             KeyError: If the key is not found.
         """
-        shard_id = hash(key)%self.shard_num
+        shard_id = hash(key) % self.shard_num
         with self.locks[shard_id]:
             self.request_queue[shard_id].put(("del", key))
             response = self.response_queue[shard_id].get()
@@ -198,7 +211,7 @@ class ShardedHashTable(MutableMapping):
 
         Yields:
             Keys from all shards.
-        """  
+        """
         for i in range(self.shard_num):
             with self.locks[i]:
                 self.request_queue[i].put(("keys",))
@@ -239,7 +252,7 @@ class ShardedHashTable(MutableMapping):
             self.close()
         except Exception as e:
             print(f"Exception was raised during context exit: {e}")
-        
+
     def atomic_update(self, key: Any, func: Callable, *args) -> Any:
         """
         Atomically applies a function to the value associated with a key.

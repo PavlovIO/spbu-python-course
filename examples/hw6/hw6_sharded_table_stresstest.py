@@ -8,7 +8,7 @@ print("start")
 
 def main() -> None:
     NUM_OPS = 5_000_000
-    READ_RATIO = 0.75
+    READ_RATIO = 0.76
     THREADS = 8
     UNIQUE_KEYS = 10_000
     print("_1_")
@@ -23,7 +23,7 @@ def main() -> None:
             rng = random.Random(thread_id)
             local_errors = 0
             for _ in range(NUM_OPS // THREADS):
-                op_type = "get" if rng.random() < READ_RATIO else "set"
+                op_type = "get" if rng.random() < READ_RATIO else rng.choice(("set","del"))
                 key = rng.randint(0, UNIQUE_KEYS - 1)
                 if op_type == "get":
                     try:
@@ -32,9 +32,16 @@ def main() -> None:
                         pass
                     except Exception:
                         local_errors += 1
-                else:
+                elif op_type == "set":
                     try:
                         table[key] = rng.randint(0, 10_000_000)
+                    except Exception:
+                        local_errors += 1
+                else:
+                    try:
+                        del table[key]
+                    except KeyError:
+                        pass
                     except Exception:
                         local_errors += 1
             return local_errors

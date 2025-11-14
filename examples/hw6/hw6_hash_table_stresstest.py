@@ -9,7 +9,6 @@ print("start")
 def main() -> None:
     NUM_OPS = 5_000_000
     READ_RATIO = 0.8
-    THREADS = 1
     UNIQUE_KEYS = 10_000
     print("_1_")
     table = HashTable(40_000)
@@ -19,11 +18,11 @@ def main() -> None:
     print("_2_")
     start = time.perf_counter()
 
-    def worker(thread_id):
-        rng = random.Random(thread_id)
+    def worker():
+        rng = random.Random(5)
         local_errors = 0
-        for _ in range(NUM_OPS // THREADS):
-            op_type = "get" if rng.random() < READ_RATIO else "set"
+        for _ in range(NUM_OPS):
+            op_type = "get" if rng.random() < READ_RATIO else rng.choice(("set","del"))
             key = rng.randint(0, UNIQUE_KEYS - 1)
             if op_type == "get":
                 try:
@@ -32,17 +31,22 @@ def main() -> None:
                     pass
                 except Exception:
                     local_errors += 1
-            else:
+            elif op_type == "set":
                 try:
                     table[key] = rng.randint(0, 10_000_000)
+                except Exception:
+                    local_errors += 1
+            else:
+                try:
+                    del table[key]
+                except KeyError:
+                    pass
                 except Exception:
                     local_errors += 1
         return local_errors
 
     print("_3_")
-    with ThreadPoolExecutor(max_workers=THREADS) as pool:
-        futures = [pool.submit(worker, i) for i in range(THREADS)]
-        total_errors = sum(f.result() for f in as_completed(futures))
+    total_errors = worker()
 
     print("_4_")
     end = time.perf_counter()

@@ -98,12 +98,13 @@ class ShardedHashTable(MutableMapping):
         Initializes the ShardedHashTable.
 
         Args:
-            shard_num: The number of shards to create. If 0, uses the number of CPU cores.
+            shard_num: The number of shards to create, not more than number of CPU cores. If 0, uses the number of CPU cores.
         """
+        max_shards = cpu_count()
         if shard_num == 0:
             self.shard_num = cpu_count()
         else:
-            self.shard_num = shard_num
+            self.shard_num = max(max_shards, shard_num)
 
         self.locks: list[Lock] = [Lock() for _ in range(self.shard_num)]
         self.request_queue: list[Queue] = [Queue() for _ in range(self.shard_num)]

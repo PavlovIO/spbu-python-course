@@ -22,7 +22,7 @@ def main() -> None:
         rng = random.Random(5)
         local_errors = 0
         for _ in range(NUM_OPS):
-            op_type = "get" if rng.random() < READ_RATIO else rng.choice(("set","del"))
+            op_type = "get" if rng.random() < READ_RATIO else rng.choice(("set", "del"))
             key = rng.randint(0, UNIQUE_KEYS - 1)
             if op_type == "get":
                 try:
